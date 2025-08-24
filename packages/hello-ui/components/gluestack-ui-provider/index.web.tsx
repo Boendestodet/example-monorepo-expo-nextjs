@@ -2,7 +2,7 @@
 import { setFlushStyles } from "@gluestack-ui/nativewind-utils/flush";
 import { OverlayProvider } from "@gluestack-ui/overlay";
 import { ToastProvider } from "@gluestack-ui/toast";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import { config } from "./config";
 import { script } from "./script";
@@ -20,6 +20,9 @@ const createStyle = (styleTagId: string) => {
 export const useSafeLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function GluestackUIProvider({ mode = "light", ...props }: { mode?: ModeType; children?: React.ReactNode }) {
+  const [isClient, setIsClient] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
   let cssVariablesWithMode = ``;
   Object.keys(config).forEach((configKey) => {
     cssVariablesWithMode += configKey === "dark" ? `\n .dark {\n ` : `\n:root {\n`;
@@ -36,27 +39,64 @@ export function GluestackUIProvider({ mode = "light", ...props }: { mode?: ModeT
     script(e.matches ? "dark" : "light");
   }, []);
 
+  // Mark as client after hydration
+  useEffect(() => {
+    setIsClient(true);
+    setIsHydrated(true);
+  }, []);
+
+  // Set initial color scheme during SSR and after hydration
   useSafeLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      const documentElement = document.documentElement;
+      if (documentElement) {
+        // Ensure we don't override the server-rendered attributes during hydration
+        if (!isHydrated) {
+          // During SSR, just ensure the classes are present
+          if (!documentElement.classList.contains(mode)) {
+            documentElement.classList.add(mode);
+          }
+          if (mode === "light" && documentElement.classList.contains("dark")) {
+            documentElement.classList.remove("dark");
+          } else if (mode === "dark" && documentElement.classList.contains("light")) {
+            documentElement.classList.remove("light");
+          }
+        } else {
+          // After hydration, we can safely manipulate the DOM
+          documentElement.classList.remove("light", "dark");
+          documentElement.classList.add(mode);
+          documentElement.style.colorScheme = mode;
+        }
+      }
+    }
+  }, [mode, isHydrated]);
+
+  // Handle mode changes after hydration
+  useSafeLayoutEffect(() => {
+    if (!isHydrated) return;
+
     if (mode !== "system") {
       const documentElement = document.documentElement;
       if (documentElement) {
+        documentElement.classList.remove("light", "dark");
         documentElement.classList.add(mode);
-        documentElement.classList.remove(mode === "light" ? "dark" : "light");
         documentElement.style.colorScheme = mode;
       }
     }
-  }, [mode]);
+  }, [mode, isHydrated]);
 
   useSafeLayoutEffect(() => {
-    if (mode !== "system") return;
+    if (!isHydrated || mode !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
 
     media.addListener(handleMediaQuery);
 
     return () => media.removeListener(handleMediaQuery);
-  }, [handleMediaQuery]);
+  }, [handleMediaQuery, mode, isHydrated]);
 
   useSafeLayoutEffect(() => {
+    if (!isHydrated) return;
+
     if (typeof window !== "undefined") {
       const documentElement = document.documentElement;
       if (documentElement) {
@@ -69,16 +109,18 @@ export function GluestackUIProvider({ mode = "light", ...props }: { mode?: ModeT
         }
       }
     }
-  }, []);
+  }, [isHydrated]);
 
   return (
     <>
-      <script
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: `(${script.toString()})('${mode}')`,
-        }}
-      />
+      {isClient && (
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(${script.toString()})('${mode}')`,
+          }}
+        />
+      )}
       <OverlayProvider>
         <ToastProvider>{props.children}</ToastProvider>
       </OverlayProvider>

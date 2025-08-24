@@ -3,7 +3,7 @@ const tailwindRootConfig = require("../../tailwind.config");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   ...tailwindRootConfig,
-  darkMode: "media",
+  darkMode: "class",
   content: [
     "./components/**/*.{html,js,ts,jsx,tsx,mdx}",
     "./__tests__/**/*.test.{html,js,ts,jsx,tsx,mdx}",
