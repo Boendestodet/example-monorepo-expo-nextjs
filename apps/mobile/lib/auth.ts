@@ -11,10 +11,3 @@ export async function getToken(): Promise<string | null> {
 export async function clearToken() {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
-
-export async function apiFetch(input: string, init: RequestInit = {}) {
-  const token = await getToken();
-  const headers = new Headers(init.headers);
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-  return fetch(input, { ...init, headers });
-}
