@@ -1,6 +1,6 @@
 export const script = (mode: string) => {
   if (typeof document === "undefined") return;
-  
+
   const documentElement = document.documentElement;
   if (!documentElement) return;
 
@@ -12,7 +12,7 @@ export const script = (mode: string) => {
   try {
     const isSystem = mode === "system";
     const theme = isSystem ? getSystemColorMode() : mode;
-    
+
     // Remove existing classes first
     documentElement.classList.remove("light", "dark");
     // Add the new theme class
