@@ -1,6 +1,7 @@
 import { Button, ButtonText, ButtonSpinner, ButtonIcon } from "@monorepo/hello-ui/components/button";
 import { Heading } from "@monorepo/hello-ui/components/heading";
 import { AddIcon } from "@monorepo/hello-ui/components/icon";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 
@@ -33,6 +34,9 @@ export default function Page() {
           <Text key={post.id}>{post.title}</Text>
         ))}
       </View>
+      <Button onPress={() => router.push("/login")}>
+        <ButtonText>Login</ButtonText>
+      </Button>
     </View>
   );
 }
