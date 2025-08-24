@@ -1,0 +1,176 @@
+# Cursor Rules: Expo + Next.js Monorepo
+
+## Project Overview
+
+This is a monorepo combining Expo (React Native) and Next.js (React for Web) with shared components and code. The project uses pnpm workspaces, Turbo for builds, and TypeScript throughout.
+
+## Critical Implementation Paths
+
+### Monorepo Structure
+
+- **apps/**: Contains mobile (Expo) and web (Next.js) applications
+- **packages/**: Contains shared packages (hello-ui, eslint-config, tsconfig)
+- **Root level**: Contains build configuration (turbo.json, tailwind.config.js, jest.config.ts)
+
+### Package Management
+
+- Always use `pnpm` commands, never `npm` or `yarn`
+- Use `pnpm install` in root for workspace dependencies
+- Use `pnpm dev` to start all development servers concurrently
+- Use `pnpm build` to build all applications
+
+### Development Workflow
+
+- **Mobile development**: `cd apps/mobile && pnpm dev`
+- **Web development**: `cd apps/web && pnpm dev`
+- **Shared packages**: Develop in packages/, changes auto-rebuild apps
+- **Hot reloading**: Works for both platforms with fast refresh
+
+### Cross-Platform Development
+
+- **Shared components**: Place in `packages/hello-ui/`
+- **Platform detection**: Use runtime platform detection for conditional logic
+- **Styling**: Use Tailwind CSS with NativeWind for React Native compatibility
+- **SVG**: Use react-native-svg for cross-platform vector graphics
+
+## User Preferences & Workflow
+
+### Build Process
+
+- **DO NOT** automatically run build commands
+- **DO NOT** run `npm run dev` automatically (dev server already running)
+- User handles builds themselves
+- Focus on code changes and development, not build execution
+
+### Authentication
+
+- **ALWAYS** use better-auth for authentication
+- **NEVER** replace with next-auth
+- This is a firm requirement, not a suggestion
+
+### Development Environment
+
+- Development servers are already running
+- Focus on code changes, not server startup
+- Use existing development workflow
+
+## Project-Specific Patterns
+
+### Component Architecture
+
+- **Shared first**: Prioritize shared components over platform-specific ones
+- **Composition over inheritance**: Use component composition for flexibility
+- **Platform adapters**: Create platform-specific implementations when needed
+- **Type safety**: Maintain strict TypeScript throughout
+
+### Styling Strategy
+
+- **Tailwind CSS**: Primary styling approach for web
+- **NativeWind**: Tailwind CSS for React Native
+- **Gluestack UI**: Component library with platform adapters
+- **Consistent design**: Maintain visual consistency across platforms
+
+### State Management
+
+- **React Hooks**: Primary state management approach
+- **Context API**: For cross-component state sharing
+- **Local state**: Component-level state when appropriate
+- **Unidirectional flow**: Data down, events up
+
+### Testing Strategy
+
+- **Jest**: Primary testing framework
+- **Component testing**: Test shared components across platforms
+- **Integration testing**: Test platform-specific implementations
+- **Cross-platform coverage**: Ensure features work on both platforms
+
+## Known Challenges
+
+### Platform Differences
+
+- **React Native vs. Web**: Handle platform-specific APIs and behaviors
+- **Styling differences**: Manage CSS vs. React Native styles
+- **Navigation**: Handle Expo Router vs. Next.js routing
+- **Native features**: Manage mobile-specific functionality
+
+### Build Complexity
+
+- **Turbo caching**: Understand build artifact caching
+- **Workspace dependencies**: Manage complex dependency relationships
+- **Type checking**: Ensure TypeScript works across all packages
+- **Parallel builds**: Optimize concurrent build processes
+
+### Development Experience
+
+- **Hot reloading**: Ensure both platforms reload properly
+- **Error handling**: Provide clear error messages across platforms
+- **Debugging**: Support debugging for both mobile and web
+- **Performance**: Maintain fast development feedback loops
+
+## Tool Usage Patterns
+
+### VS Code
+
+- **Extensions**: ESLint, Prettier, TypeScript, React Native Tools
+- **Settings**: Auto-format on save, lint on save
+- **Workspace**: Use monorepo workspace for efficient development
+
+### Terminal Commands
+
+- **pnpm dev**: Start all development servers
+- **pnpm build**: Build all applications
+- **pnpm test**: Run all tests
+- **pnpm lint**: Lint all code
+
+### Git Workflow
+
+- **Feature branches**: Create feature branches for development
+- **Commit messages**: Use conventional commit format
+- **Pull requests**: Review changes before merging
+- **Workspace awareness**: Consider monorepo impact of changes
+
+## Evolution of Project Decisions
+
+### Architecture Choices
+
+- **Monorepo**: Chosen for code sharing and unified development
+- **pnpm**: Selected for efficient workspace management
+- **Turbo**: Adopted for fast, cached builds
+- **TypeScript**: Mandated for type safety across all packages
+
+### Technology Stack
+
+- **React 19**: Latest React for modern features
+- **Expo 53**: Latest Expo for mobile development
+- **Next.js 15**: Latest Next.js for web development
+- **Tailwind CSS**: Utility-first CSS for rapid development
+
+### Development Tools
+
+- **ESLint + Prettier**: Code quality and formatting
+- **Jest**: Testing framework with React Native support
+- **SWC**: Fast JavaScript/TypeScript compilation
+- **React Native Web**: Web compatibility for React Native
+
+## Future Considerations
+
+### Scalability
+
+- **Package growth**: Plan for additional shared packages
+- **Team growth**: Support multiple developers working concurrently
+- **Feature complexity**: Handle increasingly complex cross-platform features
+- **Performance**: Maintain build and runtime performance
+
+### Maintenance
+
+- **Dependency updates**: Regular updates of all dependencies
+- **Security patches**: Prompt application of security updates
+- **Documentation**: Keep memory bank and code documentation current
+- **Testing**: Maintain comprehensive test coverage
+
+### Enhancement
+
+- **New platforms**: Consider adding desktop, TV, or other platforms
+- **Advanced features**: Implement complex business logic and workflows
+- **Performance monitoring**: Add real-time performance tracking
+- **Analytics**: Implement user behavior and usage analytics
